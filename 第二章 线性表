@@ -1,1 +1,88 @@
 2.2 线性表类型的实现  顺序映像
+
+用上述定义的单链表实现线性表的操作时，存在的问题：
+1.单链表的表长是一个隐含值；
+2.在单链表的最后一个元素位置最后插入元素时，需要遍历整个链表；
+3.在链表中，元素的“位序”概念淡化，结点的“位置 ”概念强化。
+
+改变链表设置：
+1.增加表长，表尾指针和当前位置的指针 三个数据域。
+2.将基本操作结构的位序改为指针。
+
+一个带头结点的线性链表类型
+typedef struct LNode//结点类型
+{
+  ElemType data;
+  struct LNode *next;
+}*Link,*Position;
+
+Status MakeNode(Link &p,Elem e);
+//分配由p指向的值为e的结点，并返回OK；
+//若分配失败，则返回ERROR
+
+void FreeNode(Link &p);
+//释放p所指结点
+
+typedef struct//链表类型
+{
+  Link head,tail;//指向头结点和最后一个结点
+  int len;//指示链表长度
+  Link current;
+  //指向当前访问的结点的指针，初始位置指向头结点
+}LinkList;
+
+链表的基本操作：
+{结构初始化和销毁结构}
+
+Status InitList(LinkList &L);
+//构造一个空的线性链表L
+//头指针，尾指针和当前指针均指向头结点
+//表长为零
+
+Status DestroyList(LinkList &L);
+//销毁线性链表L，L不再存在
+
+{引用型操作}
+Status ListEmpty(LinkList L);//判断表空
+int ListLength(LinkList L);//求表长
+Status Prior(LinkList L);//改变当前指针指向其前驱
+Status Next(LinkList L);//改变当前指针指向其后继
+ElemType GetCurElem(LinkList L);//返回当前指针所指数据元素
+Status LocatePos(LinkList L,int i);//改变当前指针指向第i个结点
+Status LocateElem(LinkList L,ElemType e,
+Status (*compare)(ElemType,ElemType));
+//若存在与e满足函数compare()判定关系的函数，则移动当前指针
+//指向第一个满足条件的元素，并返回OK，否则返回ERROR
+Sttus ListTraverse(LinkList L,Status(*visit)());
+//依次对L的每个元素调用函数visit()
+
+{加工型操作}
+Status ClearList(LinkList &L);//重置为空表
+Status SetCurElem(LinkList &L,ElemType e);//更新当前指针所指数据元素
+Status Append(LinkList &L,Link s);//一串结点链接在最后一个结点之后
+Status InsAfter(LinkList &L,ElemType e);//将元素e插入在当前指针之后
+Status DelAfter(LinkList &L,ElemType *e);//删除当前指针之后的结点
+
+
+Status InsAfter(LinkList &L,ElemType e)
+{//若当前指针在链表中，则将数据元素e插入在线性链表L中
+//当前指针所指结点之后，并返回OK，否则返回ERROR
+  if(!L.current) return ERROR;
+  if(!MakeNode(s,e)) return ERROR;
+  s->next=L.current->next;
+  L.current->next=s;
+  return OK;
+}
+
+Status DelAfter(LinkList &L,ElemType e)
+{//若当前指针及其后继在链表中，则删除线性链表L中当前
+//指针所指结点之后的结点，并返回OK，否则返回ERROR
+  if(!(L.current && L.current->next))
+    return ERROR;
+  q=L.current->next;
+  L.current->next=q->next;
+  e=q->data;
+  FreeNode(q);
+  return OK;
+}
+//利用上述定义的线性链表可以完成线性表的其他操作
